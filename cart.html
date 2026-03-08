@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Giỏ hàng</title>
+</head>
+
+<body>
+
+<h2>Giỏ hàng</h2>
+
+<div id="cart"></div>
+
+<script>
+
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+let total=0
+
+cart.forEach(p=>{
+
+document.getElementById("cart").innerHTML+=`
+<p>${p.name} - ${p.price}đ</p>
+`
+
+total+=p.price
+
+})
+
+document.getElementById("cart").innerHTML+=
+`<h3>Tổng tiền: ${total}đ</h3>`
+
+</script>
+
+</body>
+
+</html>
