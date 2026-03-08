@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<meta charset="UTF-8">
 <title>Giỏ hàng</title>
 </head>
 
@@ -13,25 +14,64 @@
 
 <script>
 
-let cart = JSON.parse(localStorage.getItem("cart")) || []
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let total = 0;
 
-let total=0
+let cartDiv = document.getElementById("cart");
 
-cart.forEach(p=>{
+if(cart.length === 0){
+    cartDiv.innerHTML = "<p>Giỏ hàng trống</p>";
+}else{
 
-document.getElementById("cart").innerHTML+=`
-<p>${p.name} - ${p.price}đ</p>
-`
+cart.forEach((p,i)=>{
 
-total+=p.price
+cartDiv.innerHTML += `
+<p>
+${p.name} - ${p.price}đ 
+<button onclick="removeItem(${i})">Xóa</button>
+</p>
+`;
 
-})
+total += p.price;
 
-document.getElementById("cart").innerHTML+=
-`<h3>Tổng tiền: ${total}đ</h3>`
+});
+
+cartDiv.innerHTML += `<h3>Tổng tiền: ${total}đ</h3>`;
+cartDiv.innerHTML += `<button onclick="checkout()">Thanh toán</button>`;
+
+}
+
+function removeItem(i){
+
+cart.splice(i,1);
+
+localStorage.setItem("cart",JSON.stringify(cart));
+
+location.reload();
+
+}
+
+function checkout(){
+
+let user = localStorage.getItem("user");
+
+if(!user){
+
+alert("Bạn cần đăng nhập trước khi thanh toán");
+window.location.href="login.html";
+return;
+
+}
+
+alert("Thanh toán thành công!");
+
+localStorage.removeItem("cart");
+
+location.reload();
+
+}
 
 </script>
 
 </body>
-
 </html>
