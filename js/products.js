@@ -1,48 +1,65 @@
 let products = [
 
 {
-name:"Áo hoodie",
+name:"Áo Việt Nam",
 price:200000,
-img:"image/aovn.png"
+img:"images/aovn.png",
+category:"fashion"
 },
 
 {
-name:"Giày sneaker",
+name:"Baby Oil",
+price:150000,
+img:"images/babyoil.png",
+category:"accessories"
+},
+
+{
+name:"Diddy",
+price:100000,
+img:"images/diddy.png",
+category:"electronics"
+},
+
+{
+name:"Pọt Ché",
 price:500000,
-img:"image/aovn.png"
-},
-
-{
-name:"Tai nghe gaming",
-price:350000,
-img:"https://via.placeholder.com/200"
-},
-
-{
-name:"Chuột gaming",
-price:250000,
-img:"https://via.placeholder.com/200"
+img:"images/porsche.png",
+category:"gaming"
 }
 
 ]
 
-let container = document.getElementById("products")
+function filterCategory(cat){
 
-products.forEach((p,i)=>{
+let productDiv = document.getElementById("products")
 
-container.innerHTML += `
+productDiv.innerHTML=""
+
+products.forEach(p=>{
+
+if(cat==="all" || p.category===cat){
+
+productDiv.innerHTML += `
 <div class="product">
 
 <img src="${p.img}">
+
 <h4>${p.name}</h4>
 
 <p class="price">${p.price}đ</p>
 
-<button onclick="addCart(${i})">
+<button onclick="addCart('${p.name}',${p.price},'${p.img}')">
 Thêm vào giỏ
 </button>
 
 </div>
 `
 
+}
+
 })
+
+}
+
+filterCategory("all")
