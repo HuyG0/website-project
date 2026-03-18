@@ -2,6 +2,7 @@
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 cart = cart.filter(item => item !== null);
 
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let currentFilter = 'all';
 let searchTerm = '';
 
@@ -11,32 +12,13 @@ const products = [
     { id: 1, name: 'Áo thun nam', price: 199000, oldPrice: 299000, image: 'https://via.placeholder.com/300x300', category: 'thoitrang', rating: 4.5, sold: 150, tag: 'sale' },
     { id: 2, name: 'Quần jean nữ', price: 349000, oldPrice: 499000, image: 'https://via.placeholder.com/300x300', category: 'thoitrang', rating: 4.8, sold: 89, tag: 'new' },
     { id: 3, name: 'Váy đầm dự tiệc', price: 599000, oldPrice: 899000, image: 'https://via.placeholder.com/300x300', category: 'thoitrang', rating: 4.7, sold: 45 },
-    
-    // Điện tử
     { id: 4, name: 'Điện thoại thông minh', price: 7990000, oldPrice: 9990000, image: 'https://via.placeholder.com/300x300', category: 'dientu', rating: 4.9, sold: 234, tag: 'sale' },
     { id: 5, name: 'Laptop cao cấp', price: 15990000, oldPrice: 18990000, image: 'https://via.placeholder.com/300x300', category: 'dientu', rating: 4.8, sold: 67 },
     { id: 6, name: 'Tai nghe không dây', price: 1290000, oldPrice: 1990000, image: 'https://via.placeholder.com/300x300', category: 'dientu', rating: 4.6, sold: 456, tag: 'new' },
-    
-    // Gia dụng
     { id: 7, name: 'Nồi chiên không dầu', price: 1590000, oldPrice: 2490000, image: 'https://via.placeholder.com/300x300', category: 'giadung', rating: 4.7, sold: 123 },
     { id: 8, name: 'Máy xay sinh tố', price: 890000, oldPrice: 1290000, image: 'https://via.placeholder.com/300x300', category: 'giadung', rating: 4.5, sold: 89, tag: 'sale' },
     { id: 9, name: 'Bộ dao nhà bếp', price: 450000, oldPrice: 690000, image: 'https://via.placeholder.com/300x300', category: 'giadung', rating: 4.4, sold: 234 },
-    
-    // Sách
-    { id: 10, name: 'Sách dạy nấu ăn', price: 180000, oldPrice: 250000, image: 'https://via.placeholder.com/300x300', category: 'sach', rating: 4.6, sold: 78, tag: 'new' },
-    { id: 11, name: 'Tiểu thuyết bestseller', price: 120000, oldPrice: 150000, image: 'https://via.placeholder.com/300x300', category: 'sach', rating: 4.8, sold: 345 },
-    
-    // Thể thao
-    { id: 12, name: 'Giày chạy bộ', price: 890000, oldPrice: 1290000, image: 'https://via.placeholder.com/300x300', category: 'thethao', rating: 4.7, sold: 167, tag: 'sale' },
-    { id: 13, name: 'Bóng đá', price: 250000, oldPrice: 350000, image: 'https://via.placeholder.com/300x300', category: 'thethao', rating: 4.5, sold: 89 },
-    
-    // Làm đẹp
-    { id: 14, name: 'Son môi cao cấp', price: 320000, oldPrice: 450000, image: 'https://via.placeholder.com/300x300', category: 'lamdep', rating: 4.8, sold: 567, tag: 'new' },
-    { id: 15, name: 'Kem dưỡng da', price: 450000, oldPrice: 650000, image: 'https://via.placeholder.com/300x300', category: 'lamdep', rating: 4.7, sold: 234 },
-    
-    // Thực phẩm
-    { id: 16, name: 'Hộp quà trái cây', price: 350000, oldPrice: 450000, image: 'https://via.placeholder.com/300x300', category: 'thucpham', rating: 4.6, sold: 123 },
-    { id: 17, name: 'Set quà tết', price: 890000, oldPrice: 1290000, image: 'https://via.placeholder.com/300x300', category: 'thucpham', rating: 4.8, sold: 45, tag: 'sale' }
+    { id: 10, name: 'Sách dạy nấu ăn', price: 180000, oldPrice: 250000, image: 'https://via.placeholder.com/300x300', category: 'sach', rating: 4.6, sold: 78, tag: 'new' }
 ];
 
 // Khởi tạo trang
@@ -44,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cleanCart();
     displayProducts();
     updateCartCount();
+    checkLoginStatus();
     
     document.getElementById('searchInput').addEventListener('keyup', function(e) {
         searchTerm = e.target.value.toLowerCase();
@@ -56,6 +39,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Kiểm tra trạng thái đăng nhập
+function checkLoginStatus() {
+    if (currentUser) {
+        document.querySelector('.auth-buttons').style.display = 'none';
+        document.querySelector('.user-info').style.display = 'flex';
+        document.getElementById('usernameDisplay').textContent = currentUser.username;
+    } else {
+        document.querySelector('.auth-buttons').style.display = 'flex';
+        document.querySelector('.user-info').style.display = 'none';
+    }
+}
+
 // Format giá tiền
 function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -66,12 +61,10 @@ function displayProducts() {
     const productGrid = document.getElementById('productGrid');
     let filteredProducts = products;
     
-    // Lọc theo danh mục
     if (currentFilter !== 'all') {
         filteredProducts = filteredProducts.filter(p => p.category === currentFilter);
     }
     
-    // Lọc theo tìm kiếm
     if (searchTerm) {
         filteredProducts = filteredProducts.filter(p => 
             p.name.toLowerCase().includes(searchTerm)
@@ -127,31 +120,37 @@ function generateStars(rating) {
     return stars;
 }
 
-// Lọc sản phẩm theo danh mục
+// Lọc sản phẩm
 function filterProducts(category) {
     currentFilter = category;
-    
-    // Cập nhật active class
     document.querySelectorAll('.categories li').forEach(li => {
         li.classList.remove('active');
     });
     event.currentTarget.classList.add('active');
-    
     displayProducts();
 }
 
-// Cuộn đến phần sản phẩm
+// Cuộn đến sản phẩm
 function scrollToProducts() {
     document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Hàm làm sạch giỏ hàng
+// ===== GIỎ HÀNG =====
 function cleanCart() {
     cart = cart.filter(item => item !== null);
     saveCart();
 }
 
-// Cập nhật số lượng giỏ hàng
+function saveCart() {
+    try {
+        const cleanData = cart.filter(item => item !== null);
+        localStorage.setItem('cart', JSON.stringify(cleanData));
+        cart = cleanData;
+    } catch (error) {
+        console.error('Lỗi khi lưu giỏ hàng:', error);
+    }
+}
+
 function updateCartCount() {
     try {
         if (!Array.isArray(cart)) {
@@ -176,19 +175,14 @@ function updateCartCount() {
     }
 }
 
-// Lưu giỏ hàng vào localStorage
-function saveCart() {
-    try {
-        const cleanData = cart.filter(item => item !== null);
-        localStorage.setItem('cart', JSON.stringify(cleanData));
-        cart = cleanData;
-    } catch (error) {
-        console.error('Lỗi khi lưu giỏ hàng:', error);
-    }
-}
-
-// Thêm vào giỏ hàng
+// THÊM VÀO GIỎ - KIỂM TRA ĐĂNG NHẬP
 function addToCart(productId) {
+    if (!currentUser) {
+        showNotification('Vui lòng đăng nhập để mua hàng!');
+        openLoginModal();
+        return;
+    }
+    
     try {
         const product = products.find(p => p.id === productId);
         if (!product) {
@@ -225,8 +219,14 @@ function addToCart(productId) {
     }
 }
 
-// Mở modal giỏ hàng
+// MỞ GIỎ HÀNG - KIỂM TRA ĐĂNG NHẬP
 function openCartModal() {
+    if (!currentUser) {
+        showNotification('Vui lòng đăng nhập để xem giỏ hàng!');
+        openLoginModal();
+        return;
+    }
+    
     try {
         cleanCart();
         const modal = document.getElementById('cartModal');
@@ -242,12 +242,10 @@ function openCartModal() {
     }
 }
 
-// Đóng modal giỏ hàng
 function closeCartModal() {
     document.getElementById('cartModal').style.display = 'none';
 }
 
-// Hiển thị giỏ hàng
 function displayCartItems() {
     const cartItems = document.getElementById('cartItems');
     
@@ -318,7 +316,6 @@ function displayCartItems() {
     }
 }
 
-// Cập nhật số lượng
 function updateQuantity(productId, newQuantity) {
     try {
         if (newQuantity < 1) {
@@ -341,7 +338,6 @@ function updateQuantity(productId, newQuantity) {
     }
 }
 
-// Xóa khỏi giỏ hàng
 function removeFromCart(productId) {
     try {
         cart = cart.filter(item => item !== null && item.id !== productId);
@@ -355,23 +351,35 @@ function removeFromCart(productId) {
     }
 }
 
-// Mở modal thanh toán
+// ===== THANH TOÁN - KIỂM TRA ĐĂNG NHẬP =====
 function openCheckoutModal() {
+    if (!currentUser) {
+        showNotification('Vui lòng đăng nhập để thanh toán!');
+        openLoginModal();
+        return;
+    }
+    
     if (cart.length === 0) {
         showNotification('Giỏ hàng của bạn đang trống!');
         return;
     }
+    
     closeCartModal();
     document.getElementById('checkoutModal').style.display = 'block';
 }
 
-// Đóng modal thanh toán
 function closeCheckoutModal() {
     document.getElementById('checkoutModal').style.display = 'none';
 }
 
-// Xử lý thanh toán
 function processPayment() {
+    if (!currentUser) {
+        showNotification('Vui lòng đăng nhập để thanh toán!');
+        closeCheckoutModal();
+        openLoginModal();
+        return;
+    }
+    
     const form = document.getElementById('checkoutForm');
     
     if (!form.checkValidity()) {
@@ -379,10 +387,6 @@ function processPayment() {
         return;
     }
     
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const address = document.getElementById('address').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
     
     if (!paymentMethod) {
@@ -390,7 +394,23 @@ function processPayment() {
         return;
     }
     
-    // Xử lý thanh toán ở đây
+    // Lưu đơn hàng
+    const order = {
+        user: currentUser.username,
+        fullName: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        paymentMethod: paymentMethod,
+        items: cart,
+        total: document.getElementById('total').textContent,
+        date: new Date().toISOString()
+    };
+    
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
     showNotification('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.');
     
     // Xóa giỏ hàng
@@ -400,12 +420,107 @@ function processPayment() {
     
     // Đóng modal
     closeCheckoutModal();
-    
-    // Reset form
     form.reset();
 }
 
-// Hiển thị thông báo
+// ===== ĐĂNG NHẬP / ĐĂNG KÝ =====
+function openLoginModal() {
+    closeRegisterModal();
+    document.getElementById('loginModal').style.display = 'block';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('loginForm').reset();
+}
+
+function openRegisterModal() {
+    closeLoginModal();
+    document.getElementById('registerModal').style.display = 'block';
+}
+
+function closeRegisterModal() {
+    document.getElementById('registerModal').style.display = 'none';
+    document.getElementById('registerForm').reset();
+}
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    if (!username || !password) {
+        showNotification('Vui lòng nhập đầy đủ thông tin!');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+        currentUser = { username: user.username, email: user.email };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        showNotification('Đăng nhập thành công!');
+        closeLoginModal();
+        checkLoginStatus();
+    } else {
+        showNotification('Tên đăng nhập hoặc mật khẩu không đúng!');
+    }
+}
+
+function register() {
+    const username = document.getElementById('regUsername').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    
+    if (!username || !email || !password || !confirmPassword) {
+        showNotification('Vui lòng điền đầy đủ thông tin!');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showNotification('Mật khẩu xác nhận không khớp!');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showNotification('Mật khẩu phải có ít nhất 6 ký tự!');
+        return;
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    if (users.some(u => u.username === username)) {
+        showNotification('Tên đăng nhập đã tồn tại!');
+        return;
+    }
+    
+    if (users.some(u => u.email === email)) {
+        showNotification('Email đã được sử dụng!');
+        return;
+    }
+    
+    users.push({ username, email, password });
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    showNotification('Đăng ký thành công! Vui lòng đăng nhập.');
+    closeRegisterModal();
+    openLoginModal();
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    showNotification('Đã đăng xuất thành công!');
+    checkLoginStatus();
+    
+    // Đóng tất cả modal
+    closeCartModal();
+    closeCheckoutModal();
+    closeNotificationModal();
+}
+
+// ===== THÔNG BÁO =====
 function showNotification(message) {
     const modal = document.getElementById('notificationModal');
     const messageEl = document.getElementById('notificationMessage');
@@ -413,29 +528,22 @@ function showNotification(message) {
     modal.style.display = 'block';
 }
 
-// Đóng modal thông báo
 function closeNotificationModal() {
     document.getElementById('notificationModal').style.display = 'none';
 }
 
 // Đóng modal khi click bên ngoài
 window.onclick = function(event) {
-    const cartModal = document.getElementById('cartModal');
-    const checkoutModal = document.getElementById('checkoutModal');
-    const notificationModal = document.getElementById('notificationModal');
-    
-    if (event.target === cartModal) {
-        cartModal.style.display = 'none';
-    }
-    if (event.target === checkoutModal) {
-        checkoutModal.style.display = 'none';
-    }
-    if (event.target === notificationModal) {
-        notificationModal.style.display = 'none';
-    }
+    const modals = ['cartModal', 'checkoutModal', 'notificationModal', 'loginModal', 'registerModal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 }
 
-// Hàm xóa tất cả giỏ hàng (debug)
+// Debug
 function clearCart() {
     cart = [];
     saveCart();
